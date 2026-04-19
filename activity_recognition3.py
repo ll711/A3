@@ -98,31 +98,45 @@ def plot_raw_data(raw_data_features, raw_data_labels):
       The first subplot is the the accelerometer magnitude. The second subplot is the barometric pressure.
       The third subplot is the activity label (check "activity_indices" to see what activity each index corresponds to).
   """
+  plt.figure(figsize=(12, 10))
+
+  # Plot the 3-axis acceleration
+  plt.subplot(4, 1, 1)
+  plt.plot(raw_data_features[:, 0], label='X-axis')
+  plt.plot(raw_data_features[:, 1], label='Y-axis')
+  plt.plot(raw_data_features[:, 2], label='Z-axis')
+  plt.legend(loc='upper right', fontsize=8)
+  plt.xticks(fontsize=8)
+  plt.ylabel('Acceleration', fontsize=8)
+  plt.yticks(fontsize=8)
+  plt.gca().set_title('3-Axis Continuous Acceleration', fontsize=8)
+
   accel_magnitudes = np.sqrt((raw_data_features[:, 0]**2).reshape(-1, 1)+
                              (raw_data_features[:, 1]**2).reshape(-1, 1)+
                              (raw_data_features[:, 2]**2).reshape(-1, 1))
 
-  plt.subplot(3, 1, 1)
+  plt.subplot(4, 1, 2)
   plt.plot(accel_magnitudes)
   plt.xticks(fontsize=8)
   plt.ylabel('Acceleration (m/s^2)', fontsize=8)
   plt.yticks(fontsize=8)
   plt.gca().set_title('Accelerometer Magnitude', fontsize=8)
 
-  plt.subplot(3, 1, 2)
-  plt.plot(raw_data_features[:, 3])
+  plt.subplot(4, 1, 3)
+  plt.plot(raw_data_features[:, 3], color='orange')
   plt.xticks(fontsize=8)
   plt.ylabel('Pressure (mbar)', fontsize=8)
   plt.yticks(fontsize=8)
   plt.gca().set_title('Barometric Pressure', fontsize=8)
 
-  plt.subplot(3, 1, 3)
-  plt.plot(raw_data_labels)
+  plt.subplot(4, 1, 4)
+  plt.plot(raw_data_labels, color='red')
   plt.xticks(fontsize=8)
   plt.yticks(fontsize=8)
   plt.ylabel('Activity', fontsize=8)
   plt.gca().set_title('Activity Label', fontsize=8)
   plt.grid(True)
+  plt.tight_layout()
 
   os.makedirs('./data_processing', exist_ok=True)
   plt.savefig('./data_processing/raw_data.png', bbox_inches='tight')
@@ -196,31 +210,62 @@ def plot_extracted_features(features, labels):
   """ This function plots the extracted features. The top plot is the slope of accelerometer X-axis data.
       The middle plot is the slope of barometric pressure data. The bottom plot is the activity label.
   """
-  # Plot the acceleration X-axis slope
-  plt.subplot(3, 1, 1)
-  plt.plot(features[:, 0])
+  plt.figure(figsize=(12, 15))
+
+  # Plot the acceleration X axis slope
+  plt.subplot(6, 1, 1)
+  plt.plot(features[:, 0], label='X-Slope', color='blue')
+  plt.legend(loc='upper right', fontsize=8)
   plt.xticks(fontsize=8)
   plt.yticks(fontsize=8)
   plt.ylabel('Slope', fontsize=8)
   plt.gca().set_title('Slope of Accelerometer X-axis', fontsize=8)
 
+  # Plot the acceleration Y axis slope
+  plt.subplot(6, 1, 2)
+  plt.plot(features[:, 1], label='Y-Slope', color='cyan')
+  plt.legend(loc='upper right', fontsize=8)
+  plt.xticks(fontsize=8)
+  plt.yticks(fontsize=8)
+  plt.ylabel('Slope', fontsize=8)
+  plt.gca().set_title('Slope of Accelerometer Y-axis', fontsize=8)
+
+  # Plot the acceleration Z axis slope
+  plt.subplot(6, 1, 3)
+  plt.plot(features[:, 2], label='Z-Slope', color='magenta')
+  plt.legend(loc='upper right', fontsize=8)
+  plt.xticks(fontsize=8)
+  plt.yticks(fontsize=8)
+  plt.ylabel('Slope', fontsize=8)
+  plt.gca().set_title('Slope of Accelerometer Z-axis', fontsize=8)
+
   # Plot the barometer slope
-  plt.subplot(3, 1, 2)
-  plt.plot(features[:, -1])
+  plt.subplot(6, 1, 4)
+  plt.plot(features[:, -1], color='orange')
   plt.xticks(fontsize=8)
   plt.yticks(fontsize=8)
   plt.ylabel('mbar/s', fontsize=8)
-  plt.gca().set_title('Slope of Barometric Pressure', fontsize=8)
+  plt.gca().set_title('Rate of Change of Barometric Pressure (Slope)', fontsize=8)
 
-  plt.subplot(3, 1, 3)
-  plt.plot(labels)
+  # Plot one of the FFT Equal Band Powers
+  plt.subplot(6, 1, 5)
+  plt.plot(features[:, 3], color='green')
   plt.xticks(fontsize=8)
   plt.yticks(fontsize=8)
-  plt.gca().set_title('Activity', fontsize=8)
-  plt.grid(True)
+  plt.ylabel('FFT Power', fontsize=8)
+  plt.gca().set_title('FFT Equispaced Band Power (First Band)', fontsize=8)
 
-  os.makedirs('./data_process', exist_ok=True)
-  plt.savefig('./data_process/extracted_features.png', bbox_inches='tight')
+  plt.subplot(6, 1, 6)
+  plt.plot(labels, color='red')
+  plt.xticks(fontsize=8)
+  plt.yticks(fontsize=8)
+  plt.ylabel('Activity', fontsize=8)
+  plt.gca().set_title('Activity Label', fontsize=8)
+  plt.grid(True)
+  plt.tight_layout()
+
+  os.makedirs('./data_processing', exist_ok=True)
+  plt.savefig('./data_processing/extracted_features.png', bbox_inches='tight')
   plt.show()
 
 

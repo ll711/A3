@@ -1,8 +1,6 @@
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 from collections import Counter
-from sklearn.ensemble import RandomForestClassifier
 
 def feature_extraction(raw_data_features, raw_data_labels, timestamps):
   """    raw_data_features: The fourth column is the barometer data.
@@ -62,87 +60,3 @@ def feature_extraction(raw_data_features, raw_data_labels, timestamps):
       labels = np.append(labels, [label], axis=0)
 
   return features, labels
-
-
-def plot_extracted_features(features, labels):
-  """ This function plots the extracted features. The top plot is the slope of accelerometer X-axis data.
-      The middle plot is the slope of barometric pressure data. The bottom plot is the activity label.
-  """
-  plt.figure(figsize=(12, 15))
-
-  # Plot the acceleration X axis slope
-  plt.subplot(6, 1, 1)
-  plt.plot(features[:, 0], label='X-Slope', color='blue')
-  plt.legend(loc='upper right', fontsize=8)
-  plt.xticks(fontsize=8)
-  plt.yticks(fontsize=8)
-  plt.ylabel('Slope', fontsize=8)
-  plt.gca().set_title('Slope of Accelerometer X-axis', fontsize=8)
-
-  # Plot the acceleration Y axis slope
-  plt.subplot(6, 1, 2)
-  plt.plot(features[:, 1], label='Y-Slope', color='cyan')
-  plt.legend(loc='upper right', fontsize=8)
-  plt.xticks(fontsize=8)
-  plt.yticks(fontsize=8)
-  plt.ylabel('Slope', fontsize=8)
-  plt.gca().set_title('Slope of Accelerometer Y-axis', fontsize=8)
-
-  # Plot the acceleration Z axis slope
-  plt.subplot(6, 1, 3)
-  plt.plot(features[:, 2], label='Z-Slope', color='magenta')
-  plt.legend(loc='upper right', fontsize=8)
-  plt.xticks(fontsize=8)
-  plt.yticks(fontsize=8)
-  plt.ylabel('Slope', fontsize=8)
-  plt.gca().set_title('Slope of Accelerometer Z-axis', fontsize=8)
-
-  # Plot the barometer slope
-  plt.subplot(6, 1, 4)
-  plt.plot(features[:, -1], color='orange')
-  plt.xticks(fontsize=8)
-  plt.yticks(fontsize=8)
-  plt.ylabel('mbar/s', fontsize=8)
-  plt.gca().set_title('Rate of Change of Barometric Pressure (Slope)', fontsize=8)
-
-  # Plot one of the FFT Equal Band Powers
-  plt.subplot(6, 1, 5)
-  plt.plot(features[:, 3], color='green')
-  plt.xticks(fontsize=8)
-  plt.yticks(fontsize=8)
-  plt.ylabel('FFT Power', fontsize=8)
-  plt.gca().set_title('FFT Equispaced Band Power (First Band)', fontsize=8)
-
-  plt.subplot(6, 1, 6)
-  plt.plot(labels, color='red')
-  plt.xticks(fontsize=8)
-  plt.yticks(fontsize=8)
-  plt.ylabel('Activity', fontsize=8)
-  plt.gca().set_title('Activity Label', fontsize=8)
-  plt.grid(True)
-  plt.tight_layout()
-
-  os.makedirs('./data_processing', exist_ok=True)
-  plt.savefig('./data_processing/extracted_features.png', bbox_inches='tight')
-  plt.show()
-
-
-def plot_feature_importances(features, labels):
-    clf = RandomForestClassifier(n_estimators=100, random_state=42)
-    clf.fit(features, labels.ravel())
-    importances = clf.feature_importances_
-
-    feature_names = ['X-Slope', 'Y-Slope', 'Z-Slope'] + [f'FFT Band {i}' for i in range(features.shape[1]-4)] + ['Barometer Slope']
-
-    plt.figure(figsize=(10, 6))
-    indices = np.argsort(importances)
-    plt.barh(range(len(indices)), importances[indices], align='center', color='skyblue')
-    plt.yticks(range(len(indices)), [feature_names[i] for i in indices])
-    plt.xlabel('Relative Importance')
-    plt.title('Feature Importances (Random Forest)')
-    plt.tight_layout()
-
-    os.makedirs('./data_processing', exist_ok=True)
-    plt.savefig('./data_processing/feature_importances.png', bbox_inches='tight')
-    plt.show()
-

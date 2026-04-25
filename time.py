@@ -18,59 +18,55 @@ def compare_training_time():
         print("Make sure the 'uploaded' directory contains the expected data.")
         return
 
-    print("Extracting features for Method 1...")
+    print("\n--- Running Method 1 Pipeline ---")
+    print("Extracting features and training model...")
     features1, labels1 = fe1(raw_data_features, raw_data_labels, timestamps)
-
-    print("Extracting features for Method 2...")
-    features2, labels2 = fe2(raw_data_features, raw_data_labels, timestamps)
-
-    # Define models
     clf1 = DecisionTreeClassifier()
-    clf2 = DecisionTreeClassifier()
+    clf1.fit(features1, labels1.ravel())
 
-    iterations = 50
-
-    print(f"\nBenchmarking model training and prediction time over {iterations} iterations...")
-
-    # Benchmark Method 1
+    print("Benchmarking FULL DATASET feature extraction + inference...")
     start_time_1 = time.time()
-    for _ in range(iterations):
-        clf1.fit(features1, labels1.ravel())
-        clf1.predict(features1)
+    f1_full, _ = fe1(raw_data_features, raw_data_labels, timestamps)
+    clf1.predict(f1_full)
     end_time_1 = time.time()
-    avg_time_1 = (end_time_1 - start_time_1) / iterations
+    avg_time_1 = end_time_1 - start_time_1
 
-    # Benchmark Method 2
+    print("\n--- Running Method 2 Pipeline ---")
+    print("Extracting features and training model...")
+    features2, labels2 = fe2(raw_data_features, raw_data_labels, timestamps)
+    clf2 = DecisionTreeClassifier()
+    clf2.fit(features2, labels2.ravel())
+
+    print("Benchmarking FULL DATASET feature extraction + inference...")
     start_time_2 = time.time()
-    for _ in range(iterations):
-        clf2.fit(features2, labels2.ravel())
-        clf2.predict(features2)
+    f2_full, _ = fe2(raw_data_features, raw_data_labels, timestamps)
+    clf2.predict(f2_full)
     end_time_2 = time.time()
-    avg_time_2 = (end_time_2 - start_time_2) / iterations
+    avg_time_2 = end_time_2 - start_time_2
 
     print("\n" + "="*50)
     print("                   TIME COMPARISON")
     print("="*50)
-    print(f"Method 1 (first_process_character) features shape:  {features1.shape}")
-    print(f"Method 2 (second_processing_character) features shape: {features2.shape}")
+    print(f"Method 1 full features shape:  {features1.shape}")
+    print(f"Method 2 full features shape: {features2.shape}")
     print("-"*50)
-    print(f"Method 1 Avg Model (Train + Predict) Time: {avg_time_1:.6f} seconds")
-    print(f"Method 2 Avg Model (Train + Predict) Time: {avg_time_2:.6f} seconds")
+    print(f"Method 1 Full Dataset (Extract + Predict) Time: {avg_time_1:.6f} seconds")
+    print(f"Method 2 Full Dataset (Extract + Predict) Time: {avg_time_2:.6f} seconds")
     print("="*50)
 
     if avg_time_1 > avg_time_2:
-        print(f"Method 2 is {(avg_time_1/avg_time_2):.2f}x faster than Method 1.")
+        print(f"Method 2 is {(avg_time_1/avg_time_2):.2f}x faster than Method 1 on full dataset.")
     elif avg_time_2 > avg_time_1:
-        print(f"Method 1 is {(avg_time_2/avg_time_1):.2f}x faster than Method 2.")
+        print(f"Method 1 is {(avg_time_2/avg_time_1):.2f}x faster than Method 2 on full dataset.")
 
     # Visualization
-    methods = ['Method 1', 'Method 2']
+    methods = ['Method 1\n(Full Dataset)', 'Method 2\n(Full Dataset)']
     times = [avg_time_1, avg_time_2]
 
     plt.figure(figsize=(8, 6))
     bars = plt.bar(methods, times, color=['skyblue', 'lightgreen'])
-    plt.ylabel('Average Time (Seconds)')
-    plt.title('Model Training and Prediction Time Comparison')
+    plt.ylabel('Total Time (Seconds)')
+    plt.title('Full Dataset Total Time (Extract + Predict)')
 
     # Add values on top of bars
     for bar in bars:

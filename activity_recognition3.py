@@ -269,6 +269,27 @@ def plot_extracted_features(features, labels):
   plt.show()
 
 
+def plot_feature_importances(features, labels):
+    from sklearn.ensemble import RandomForestClassifier
+    clf = RandomForestClassifier(n_estimators=100, random_state=42)
+    clf.fit(features, labels.ravel())
+    importances = clf.feature_importances_
+
+    feature_names = ['X-Slope', 'Y-Slope', 'Z-Slope'] + [f'FFT Band {i}' for i in range(features.shape[1]-4)] + ['Barometer Slope']
+
+    plt.figure(figsize=(10, 6))
+    indices = np.argsort(importances)
+    plt.barh(range(len(indices)), importances[indices], align='center', color='skyblue')
+    plt.yticks(range(len(indices)), [feature_names[i] for i in indices])
+    plt.xlabel('Relative Importance')
+    plt.title('Feature Importances (Random Forest)')
+    plt.tight_layout()
+
+    os.makedirs('./data_processing', exist_ok=True)
+    plt.savefig('./data_processing/feature_importances.png', bbox_inches='tight')
+    plt.show()
+
+
 class HierarchicalClassifier:
     def __init__(self):
         self.clf_level1 = DecisionTreeClassifier()
@@ -431,6 +452,9 @@ if __name__ == "__main__":
   # You can comment out this line of code if you don't want to see the plots
   plot_extracted_features(features, labels)
 
+  "***Plot Feature Importances***"
+  # Show the importance of extracted features directly
+  plot_feature_importances(features, labels)
 
   "***Classify User's Own Data***"
   five_fold_cross_validation(features, labels)
